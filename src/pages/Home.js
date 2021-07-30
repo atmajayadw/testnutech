@@ -4,6 +4,12 @@ import Modal from '../component/Modal'
 import axios from 'axios'
 import { API_URL } from '../utils/constants.js'
 
+const Back = (props) => (
+    <button className="btn btn-secondary" onClick={props.hideBack}>
+        Show all data!
+    </button>
+);
+
 export default class Home extends Component {
     constructor(props) {
         super(props)
@@ -17,7 +23,8 @@ export default class Home extends Component {
             stok: 0,
             products: [],
             product: false,
-            nama_db: ""
+            nama_db: "",
+            back: false
         }
     }
 
@@ -189,16 +196,62 @@ export default class Home extends Component {
         })
     }
 
+    search = () => {
+
+        let nama = document.getElementById('keyword').value;
+
+        if (nama !== "" || nama !== null) {
+            axios.get(API_URL + "barang?nama=" + nama)
+                .then(res => {
+                    if (res.data.length === 1) {
+                        const products = res.data;
+                        this.setState({ products, back: true });
+                    } else if (res.data.length === 0) {
+                        alert('Barang tidak ada!')
+                    }
+                })
+
+
+
+        } else {
+            this.getData();
+        }
+
+    }
+
+    hideBack = () => {
+        this.setState({
+            back: false
+        })
+        this.getData();
+        document.getElementById("keyword").value = "";
+    }
+
     render() {
         return (
             <>
                 <div className="container mt-5">
                     <h1>CRUD NUTECH</h1>
+                    <div className="row">
+                        <div className="col-md-6">
+                            <div className="input-group mb-3">
+                                <input type="text" className="form-control" id="keyword" />
+                                <div className="input-group-append">
+                                    <button className="btn btn-info" onClick={this.search}>Cari!</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="col-md-2">
+                            {this.state.back ? <Back hideBack={this.hideBack} /> : null}
+                        </div>
+                    </div>
                     <button type="button" className="btn btn-primary" data-toggle="modal" data-target="#exampleModal" onClick={() => this.handleShow()}>
                         Tambah Data!
                     </button>
-                    <Table handleShow={this.handleShow} {...this.state} handleDelete={this.handleDelete} />
-                    <Modal {...this.state} handleFile={this.handleFile} handleChange={this.handleChange} requestGET={this.requestGET} handleEdit={this.handleEdit} clearState={this.clearState} />
+                    <div className="container" id="container">
+                        <Table handleShow={this.handleShow} {...this.state} handleDelete={this.handleDelete} />
+                        <Modal {...this.state} handleFile={this.handleFile} handleChange={this.handleChange} requestGET={this.requestGET} handleEdit={this.handleEdit} clearState={this.clearState} />
+                    </div>
 
                 </div>
             </>
