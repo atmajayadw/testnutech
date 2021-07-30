@@ -3,6 +3,7 @@ import Table from '../component/Table'
 import Modal from '../component/Modal'
 import axios from 'axios'
 import { API_URL } from '../utils/constants.js'
+import $ from 'jquery'
 
 const Back = (props) => (
     <button className="btn btn-secondary" onClick={props.hideBack}>
@@ -24,7 +25,8 @@ export default class Home extends Component {
             products: [],
             product: false,
             nama_db: "",
-            back: false
+            back: false,
+            foto_lama: ""
         }
     }
 
@@ -48,7 +50,7 @@ export default class Home extends Component {
             this.setState({
                 product,
                 nama: product.nama,
-                foto: product.foto,
+                foto_lama: product.foto,
                 harga_beli: product.harga_beli,
                 harga_jual: product.harga_jual,
                 stok: product.stok
@@ -81,12 +83,40 @@ export default class Home extends Component {
     }
 
     submitRequest = () => {
+
+
+
         //submit POST request
         const nama = this.state.nama
         const harga_beli = this.state.harga_beli
         const harga_jual = this.state.harga_jual
         const stok = this.state.stok
         const foto = this.state.foto.name
+
+        if (nama === "") {
+            alert('Nama harus diisi!');
+            return false;
+        }
+
+        if (harga_beli === 0) {
+            alert('harga beli harus diisi!');
+            return false;
+        }
+
+        if (harga_jual === 0) {
+            alert('harga jual harus diisi!');
+            return false;
+        }
+
+        if ($('#foto').get(0).files.length === 0) {
+            alert('Silahkan pilih foto!');
+            return false;
+        }
+
+        if (stok === 0) {
+            alert('stok harus diisi!');
+            return false;
+        }
 
         // ini Kalau pake Form Data upload ke REST-SERVER
         // const fd = new FormData();
@@ -103,7 +133,6 @@ export default class Home extends Component {
             foto: foto,
             stok: stok,
         }
-
         // ini Kalau pake Form Data upload ke REST-SERVER
         // axios.post(API_URL + "barang", fd)
         axios.post(API_URL + "barang", data)
@@ -118,25 +147,47 @@ export default class Home extends Component {
     }
 
 
+
     handleEdit = (e) => {
         e.preventDefault()
-        const data = {
-            nama: this.state.nama,
-            harga_beli: this.state.harga_beli,
-            harga_jual: this.state.harga_jual,
-            foto: this.state.foto,
-            stok: this.state.stok,
-        }
 
-        axios.put(API_URL + "barang/" + this.state.product.id, data)
-            .then(res => {
-                alert('Berhasil edit data!');
-                this.getData();
-            })
-            .catch(error => {
-                console.log(error);
-            })
-        this.clearState()
+        if ($('#foto').get(0).files.length === 0) {
+            const data = {
+                nama: this.state.nama,
+                harga_beli: this.state.harga_beli,
+                harga_jual: this.state.harga_jual,
+                foto: this.state.foto_lama,
+                stok: this.state.stok,
+            }
+
+            axios.put(API_URL + "barang/" + this.state.product.id, data)
+                .then(res => {
+                    alert('Berhasil edit data!');
+                    this.getData();
+                })
+                .catch(error => {
+                    console.log(error);
+                })
+            this.clearState()
+        } else {
+            const data = {
+                nama: this.state.nama,
+                harga_beli: this.state.harga_beli,
+                harga_jual: this.state.harga_jual,
+                foto: this.state.foto.name,
+                stok: this.state.stok,
+            }
+
+            axios.put(API_URL + "barang/" + this.state.product.id, data)
+                .then(res => {
+                    alert('Berhasil edit data!');
+                    this.getData();
+                })
+                .catch(error => {
+                    console.log(error);
+                })
+            this.clearState()
+        }
     }
 
     handleDelete = (id) => {

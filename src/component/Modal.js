@@ -16,6 +16,9 @@ const Modal = ({ handleChange, handleEdit, requestGET, product, handleFile, clea
 
                             <form id="modal-form">
                                 <div className="form-group">
+                                    <input type="hidden" defaultValue={product.foto} id="foto_lama" />
+                                </div>
+                                <div className="form-group">
                                     <label htmlFor="nama">Nama Barang</label>
                                     <input type="text" className="form-control" id="nama" onChange={(event) => handleChange(event)} defaultValue={product.nama} required />
                                 </div>
@@ -29,7 +32,7 @@ const Modal = ({ handleChange, handleEdit, requestGET, product, handleFile, clea
                                 </div>
                                 <div className="form-group">
                                     <label htmlFor="foto">Foto</label>
-                                    <input type="text" className="form-control" id="foto" onChange={(event) => handleChange(event)} defaultValue={product.foto} required />
+                                    <input type="file" className="form-control" id="foto" onChange={(event) => handleFile(event)} required />
                                 </div>
                                 <div className="form-group">
                                     <label htmlFor="stok">Stok</label>
@@ -78,7 +81,7 @@ const Modal = ({ handleChange, handleEdit, requestGET, product, handleFile, clea
                                     <input type="number" className="form-control" id="stok" onChange={(event) => handleChange(event)} defaultValue="" required />
                                 </div>
 
-                                <button className="btn btn-primary mt-3" onClick={requestGET} data-dismiss="modal">Tambah!</button>
+                                <button type="submit" className="btn btn-primary mt-3" onClick={requestGET} data-dismiss="modal">Tambah!</button>
                             </form>
                         </div>
                     </div>
