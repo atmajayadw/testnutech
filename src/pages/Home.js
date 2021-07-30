@@ -16,8 +16,8 @@ export default class Home extends Component {
             foto: "",
             stok: 0,
             products: [],
-            editData: false,
-            product: false
+            product: false,
+            nama_db: ""
         }
     }
 
@@ -46,6 +46,10 @@ export default class Home extends Component {
                 harga_jual: product.harga_jual,
                 stok: product.stok
             })
+        } else {
+            this.clearState();
+            document.getElementById("modal-form").reset();
+
         }
     }
 
@@ -55,16 +59,46 @@ export default class Home extends Component {
         })
     }
 
-    handleSubmit = (e) => {
+    requestGET = (e) => {
         e.preventDefault()
+        //Ambil data dari database
+        const nama = this.state.nama;
+        axios.get(API_URL + "barang?nama=" + nama)
+            .then(res => {
+                if (res.data.length === 1) {
+                    alert('Barang sudah ada!')
+                } else if (res.data.length === 0) {
+                    this.submitRequest()
+                }
+            })
+    }
+
+    submitRequest = () => {
+        //submit POST request
+        const nama = this.state.nama
+        const harga_beli = this.state.harga_beli
+        const harga_jual = this.state.harga_jual
+        const stok = this.state.stok
+        const foto = this.state.foto.name
+
+        // ini Kalau pake Form Data upload ke REST-SERVER
+        // const fd = new FormData();
+        // fd.append('file', this.state.foto, this.state.foto.name);
+        // fd.append('nama', nama);
+        // fd.append('harga_beli', harga_beli);
+        // fd.append('harga_jual', harga_jual);
+        // fd.append('stok', stok);
+
         const data = {
-            nama: this.state.nama,
-            harga_beli: this.state.harga_beli,
-            harga_jual: this.state.harga_jual,
-            foto: this.state.foto,
-            stok: this.state.stok,
+            nama: nama,
+            harga_beli: harga_beli,
+            harga_jual: harga_jual,
+            foto: foto,
+            stok: stok,
         }
 
+        // ini Kalau pake Form Data upload ke REST-SERVER
+        // axios.post(API_URL + "barang", fd)
         axios.post(API_URL + "barang", data)
             .then(res => {
                 alert('Berhasil Tambah Data');
@@ -73,9 +107,9 @@ export default class Home extends Component {
             .catch(error => {
                 console.log(error);
             })
-        this.clearState()
-
+        this.clearState();
     }
+
 
     handleEdit = (e) => {
         e.preventDefault()
@@ -95,7 +129,6 @@ export default class Home extends Component {
             .catch(error => {
                 console.log(error);
             })
-
         this.clearState()
     }
 
@@ -114,32 +147,58 @@ export default class Home extends Component {
         }
     }
 
-    // checkState = () => {
-    //     console.log(this.state)
-    // }
+    handleFile = (event) => {
+        const foto = event.target.files[0];
+
+        // validation
+        if (foto) {
+            if (!foto.name.match(/\.(jpg|png|)$/)) {
+                alert('Foto tidak valid.');
+                this.setState({
+                    foto: ''
+                });
+                return false;
+            }
+
+            if (foto.size > 100000) {
+                alert('Size lebih dari 100kb!');
+                this.setState({
+                    foto: ''
+                });
+                return false;
+            }
+        }
+
+        this.setState({
+            foto
+        })
+
+    }
 
     clearState = () => {
+        document.getElementById("modal-form").reset();
         this.setState({
+            id: "",
             nama: "",
             harga_jual: 0,
             harga_beli: 0,
             foto: "",
             stok: 0,
-            products: []
+            product: false,
+            nama_db: ""
         })
     }
+
     render() {
         return (
             <>
                 <div className="container mt-5">
                     <h1>CRUD NUTECH</h1>
-                    <button type="button" className="btn btn-primary" data-toggle="modal" data-target="#exampleModal"
-                        onClick={() => this.handleShow()}>
+                    <button type="button" className="btn btn-primary" data-toggle="modal" data-target="#exampleModal" onClick={() => this.handleShow()}>
                         Tambah Data!
                     </button>
                     <Table handleShow={this.handleShow} {...this.state} handleDelete={this.handleDelete} />
-                    {/* <button className="btn btn-success" onClick={this.checkState}>Check!</button> */}
-                    <Modal {...this.state} handleChange={this.handleChange} handleSubmit={this.handleSubmit} handleEdit={this.handleEdit} />
+                    <Modal {...this.state} handleFile={this.handleFile} handleChange={this.handleChange} requestGET={this.requestGET} handleEdit={this.handleEdit} clearState={this.clearState} />
 
                 </div>
             </>

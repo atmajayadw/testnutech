@@ -1,6 +1,4 @@
 import React, { Component } from 'react'
-import { API_URL } from '../utils/constants.js'
-import axios from 'axios'
 
 export default class Table extends Component {
     constructor(props) {
@@ -31,10 +29,12 @@ export default class Table extends Component {
                         {products && products.map((product, index) => (
                             <tr key={index}>
                                 <th scope="row">{index + 1}</th>
-                                <td>{product.foto}</td>
+                                <td>
+                                    <img src={"http://localhost:3000/foto/" + product.foto} width={200} alt="" />
+                                </td>
                                 <td>{product.nama}</td>
-                                <td>{product.harga_beli}</td>
-                                <td>{product.harga_jual}</td>
+                                <td>Rp. {product.harga_beli},- </td>
+                                <td>Rp. {product.harga_jual},- </td>
                                 <td>{product.stok}</td>
                                 <td>
                                     <button type="button" className="btn btn-primary" data-toggle="modal" data-target="#exampleModal" onClick={() => this.props.handleShow(product)}>
